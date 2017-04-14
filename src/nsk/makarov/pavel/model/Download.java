@@ -51,7 +51,6 @@ public abstract class Download extends Observable implements Downloadable, Runna
         }
     }
 
-
     public Download(String source, String dest) {
         this.source = source;
         this.dest = dest;
@@ -158,5 +157,35 @@ public abstract class Download extends Observable implements Downloadable, Runna
         } else if (getState() == DownloadState.CANCELED) {
             clear();
         }
+    }
+
+    @Override
+    public void start() {
+        DownloadState state = getState();
+        if (state == DownloadState.COMPLETED) {
+            setCurrentsize(0);
+        }
+        (new Thread(this)).start();
+    }
+
+    @Override
+    public void pause() {
+        setState(DownloadState.PAUSED);
+    }
+
+    @Override
+    public void resume() {
+        start();
+    }
+
+    @Override
+    public void cancel() {
+        setState(DownloadState.CANCELED);
+    }
+
+    @Override
+    public void fail(String message) {
+        setFailure(message);
+        setState(DownloadState.FAILED);
     }
 }

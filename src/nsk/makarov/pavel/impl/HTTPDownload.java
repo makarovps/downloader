@@ -80,34 +80,4 @@ public class HTTPDownload extends Download {
             fail(e.getMessage());
         }
     }
-
-    @Override
-    public void start() {
-        DownloadState state = getState();
-        if (state == DownloadState.COMPLETED) {
-            setCurrentsize(0);
-        }
-        (new Thread(this)).start();
-    }
-
-    @Override
-    public void pause() {
-        setState(DownloadState.PAUSED);
-    }
-
-    @Override
-    public void resume() {
-        start();
-    }
-
-    @Override
-    public void cancel() {
-        setState(DownloadState.CANCELED);
-    }
-
-    @Override
-    public void fail(String message) {
-        setFailure(message);
-        setState(DownloadState.FAILED);
-    }
 }

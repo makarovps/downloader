@@ -150,6 +150,7 @@ public class DownloadManagerView extends Application implements Observer {
         table.setEditable(false);
         table.getColumns().addAll(COLUMNS);
         table.setItems(downloads);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         table.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override

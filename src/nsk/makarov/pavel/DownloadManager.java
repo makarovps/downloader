@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadManager {
-    static final String SOURCE_PATTERN = "";
-
     private List<Download> downloads = new ArrayList<>();
     private DownloadFactory factory = new DownloadFactory();
 
@@ -18,71 +16,19 @@ public class DownloadManager {
         return downloads;
     }
 
-    private static boolean validateSource(String source) {
-        return true;
-    }
-
     public DownloadManager() {
 
     }
 
     public Download add(String source, String dest) throws DownloadException {
-        validateSource(source);
+        Download.validateSource(source);
 
         Download download = factory.getDownload(source, dest);
-        if (download != null) {
-            downloads.add(download);
-            return download;
-        } else {
+        if (download == null) {
             throw new DownloadException("Unsupported protocol: " + source);
         }
-    }
-
-    public void start(int index) throws DownloadException {
-        Download download = null;
-        try {
-            download = downloads.get(index);
-        } catch (IndexOutOfBoundsException e) {
-            throw new DownloadException("Download #" + index + " doesn't exist");
-        }
-
-        start(download);
-    }
-
-    private void start(Download download) throws DownloadException {
-        if (download == null) {
-            throw new DownloadException("Download cannot be started");
-        }
-
-        (new Thread(download)).start();
-    }
-
-    public void startAll() throws DownloadException {
-        if (downloads == null || downloads.size() == 0) {
-            throw new DownloadException("Download list is already empty, nothing to start");
-        }
-        for (Download download: downloads) {
-            start(download);
-        }
-    }
-
-    public void remove(int index) throws DownloadException {
-        if (downloads == null || downloads.size() == 0) {
-            throw new DownloadException("Download list is already empty, nothing to remove");
-        }
-
-        Download download = null;
-        try {
-            download = downloads.get(index);
-        } catch (IndexOutOfBoundsException e) {
-            throw new DownloadException("Download #" + index + " doesn't exist");
-        }
-
-        if (download.getState() != DownloadState.COMPLETED) {
-            download.cancel();
-        }
-
-        downloads.remove(index);
+        downloads.add(download);
+        return download;
     }
 
     public void remove(Download download) throws DownloadException {
@@ -102,20 +48,4 @@ public class DownloadManager {
         downloads.remove(index);
     }
 
-    public void removeAll() throws DownloadException {
-        if (downloads == null || downloads.size() == 0) {
-            throw new DownloadException("Download list is already empty, nothing to remove");
-        }
-        for (Download download: downloads) {
-            remove(download);
-        }
-    }
-
-    public void quit() {
-        try {
-            removeAll();
-        } catch (DownloadException e) {
-            e.printStackTrace();
-        }
-    }
 }
