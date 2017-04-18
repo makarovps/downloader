@@ -1,4 +1,5 @@
 package nsk.makarov.pavel.model;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +36,16 @@ public abstract class Download extends Observable implements Downloadable, Runna
         return url;
     }
 
+    public static boolean validateDest(String dest) throws DownloadException {
+        File f = new File(dest);
+        try {
+            f.getCanonicalPath();
+            return true;
+        } catch (IOException e) {
+            throw new DownloadException(e.getMessage());
+        }
+    }
+
     private String fileName() {
         return Paths.get(dest).toString() + File.separator + source.substring(source.lastIndexOf("/") + 1);
     }
@@ -63,7 +74,7 @@ public abstract class Download extends Observable implements Downloadable, Runna
         return this.state;
     }
 
-    protected void changeAndNotify() {
+    private void changeAndNotify() {
         setChanged();
         notifyObservers();
     }
@@ -89,7 +100,7 @@ public abstract class Download extends Observable implements Downloadable, Runna
         this.dest = dest;
     }
 
-    protected int getCurrentsize() {
+    public int getCurrentsize() {
         return currentsize;
     }
 
@@ -98,7 +109,7 @@ public abstract class Download extends Observable implements Downloadable, Runna
         changeAndNotify();
     }
 
-    protected int getTotalsize() {
+    public int getTotalsize() {
         return totalsize;
     }
 
@@ -106,17 +117,17 @@ public abstract class Download extends Observable implements Downloadable, Runna
         this.totalsize = totalsize;
     }
 
-    public short getProgress() {
+    public double getProgress() {
         if (currentsize == 0) {
             return 0;
         } else if (totalsize == 0) {
             return -1;
         } else {
-            return (short)(((double) currentsize / totalsize) * 100);
+            return (((double) currentsize / totalsize));
         }
     }
 
-    protected void setFailure(String failure) {
+    private void setFailure(String failure) {
         this.failure = failure;
     }
 
@@ -132,10 +143,19 @@ public abstract class Download extends Observable implements Downloadable, Runna
         download(inputStream, MAX_BUFFER_SIZE);
     }
 
-    protected void download(InputStream inputStream, int bufferSize) {
+    private void download(InputStream inputStream, int bufferSize) {
+        try {
+            RandomAccessFile file = new RandomAccessFile(fileName(), "rw");
+            download(inputStream, file, bufferSize);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    private void download(InputStream inputStream, RandomAccessFile outputFile, int bufferSize) {
         try (
                 InputStream stream = inputStream;
-                RandomAccessFile file = new RandomAccessFile(fileName(), "rw");
+                RandomAccessFile file = outputFile;
         ) {
             file.seek(getCurrentsize());
             byte[] buffer = new byte[bufferSize];
@@ -146,6 +166,7 @@ public abstract class Download extends Observable implements Downloadable, Runna
                     break;
                 }
 
+                file.write(buffer, 0, read);
                 setCurrentsize(getCurrentsize() + read);
             }
         } catch (IOException e) {
@@ -154,7 +175,7 @@ public abstract class Download extends Observable implements Downloadable, Runna
 
         if (getState() == DownloadState.IN_PROGRESS) {
             setState(DownloadState.COMPLETED);
-        } else if (getState() == DownloadState.CANCELED) {
+        } else if (getState() == DownloadState.CANCELED || getState() == DownloadState.FAILED) {
             clear();
         }
     }

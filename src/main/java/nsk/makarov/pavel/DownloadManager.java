@@ -22,6 +22,7 @@ public class DownloadManager {
 
     public Download add(String source, String dest) throws DownloadException {
         Download.validateSource(source);
+        Download.validateDest(dest);
 
         Download download = factory.getDownload(source, dest);
         if (download == null) {
@@ -32,6 +33,10 @@ public class DownloadManager {
     }
 
     public void remove(Download download) throws DownloadException {
+        if (download == null) {
+            throw new DownloadException("Download cannot be empty");
+        }
+
         if (downloads == null || downloads.size() == 0) {
             throw new DownloadException("Download list is already empty, nothing to remove");
         }

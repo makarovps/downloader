@@ -1,22 +1,12 @@
-package nsk.makarov.pavel.impl;
+package nsk.makarov.pavel.model.impl;
 
 import nsk.makarov.pavel.model.Download;
 import nsk.makarov.pavel.model.DownloadException;
 import nsk.makarov.pavel.model.DownloadState;
 
-import javax.swing.plaf.synth.SynthEditorPaneUI;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
