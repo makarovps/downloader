@@ -1,7 +1,7 @@
 package nsk.makarov.pavel.model;
 
-import nsk.makarov.pavel.impl.FTPDownload;
-import nsk.makarov.pavel.impl.HTTPDownload;
+import nsk.makarov.pavel.model.impl.FTPDownload;
+import nsk.makarov.pavel.model.impl.HTTPDownload;
 
 /**
  * Created by pavel on 07.04.17.
